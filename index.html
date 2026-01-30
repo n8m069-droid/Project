@@ -2,706 +2,498 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Earth-Sun Digital Watch</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="3D Analog Clock floating in a grid environment">
+    <meta name="author" content="3D Clock App">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>3D Analog Clock in Grid</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            width: 1080px;
-            height: 2340px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: radial-gradient(circle at center, #0a0e27 0%, #000000 100%);
-            font-family: 'Arial', sans-serif;
+        html, body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            color: #fff;
-            padding: 30px 0;
+            position: fixed;
+            background: #0a0e1a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            touch-action: none;
         }
 
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
-            width: 100%;
-        }
-
-        .models-container {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .watch-container {
-            position: relative;
-            width: 700px;
-            height: 700px;
-        }
-
-        #solar-canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 20px;
-            box-shadow: 0 0 60px rgba(63, 81, 181, 0.5);
-        }
-
-        .canvas-label {
-            position: absolute;
-            bottom: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 18px;
-            color: #90caf9;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: bold;
-        }
-
-        .earth-disc-container {
-            position: relative;
-            width: 500px;
-            height: 500px;
-        }
-
-        .earth-disc {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 6px solid #1a237e;
-            box-shadow: 
-                0 0 40px rgba(63, 81, 181, 0.6),
-                inset 0 0 40px rgba(0, 0, 0, 0.6);
-            position: relative;
-            overflow: hidden;
-            background: #000;
-        }
-
-        #earth-disc-canvas {
-            width: 100%;
-            height: 100%;
-        }
-
-        .disc-overlay {
-            position: absolute;
+        #canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            width: 100dvw;
+            height: 100dvh;
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
+            cursor: grab;
         }
 
-        .day-night-line {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 3px;
-            height: 100%;
-            background: linear-gradient(to bottom, 
-                transparent 0%, 
-                rgba(255, 215, 0, 0.8) 20%, 
-                rgba(255, 215, 0, 1) 50%, 
-                rgba(255, 215, 0, 0.8) 80%, 
-                transparent 100%);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-            transform: translateX(-50%);
-            transition: transform 0.3s ease;
+        #canvas:active {
+            cursor: grabbing;
         }
 
-        .digital-display-section {
-            width: 900px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
+        #controls {
+            position: fixed;
+            top: max(20px, env(safe-area-inset-top, 20px));
+            left: max(20px, env(safe-area-inset-left, 20px));
+            color: #4da6ff;
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: clamp(10px, 2vw, 15px);
+            border-radius: clamp(6px, 1.5vw, 10px);
+            border: 1px solid rgba(77, 166, 255, 0.5);
+            font-size: clamp(10px, 2.5vw, 13px);
+            z-index: 10;
+            max-width: calc(100vw - 40px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .main-time-display {
-            background: linear-gradient(135deg, rgba(26, 35, 126, 0.6), rgba(13, 71, 161, 0.4));
-            border: 4px solid rgba(63, 81, 181, 0.8);
-            border-radius: 25px;
-            padding: 40px;
-            box-shadow: 
-                0 0 40px rgba(63, 81, 181, 0.6),
-                inset 0 0 30px rgba(0, 0, 0, 0.4);
-            text-align: center;
+        #controls h3 {
+            margin-bottom: clamp(6px, 1.5vw, 10px);
+            color: #66b3ff;
+            font-size: clamp(12px, 3vw, 15px);
+            font-weight: 600;
         }
 
-        .timezone-label {
-            font-size: 28px;
-            color: #90caf9;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: bold;
+        #controls p {
+            margin: clamp(3px, 1vw, 5px) 0;
+            line-height: 1.4;
+            opacity: 0.9;
         }
 
-        .time-display {
-            font-family: 'Orbitron', monospace;
-            font-size: 120px;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 
-                0 0 20px rgba(255, 215, 0, 0.8),
-                0 0 40px rgba(255, 215, 0, 0.6),
-                0 0 60px rgba(255, 215, 0, 0.4);
-            letter-spacing: 8px;
-            line-height: 1;
+        /* Hide controls on very small screens or in landscape mobile */
+        @media (max-width: 400px) and (max-height: 600px), 
+               (max-height: 400px) and (orientation: landscape) {
+            #controls {
+                font-size: 9px;
+                padding: 8px;
+                top: max(10px, env(safe-area-inset-top, 10px));
+                left: max(10px, env(safe-area-inset-left, 10px));
+            }
+            
+            #controls h3 {
+                font-size: 10px;
+                margin-bottom: 4px;
+            }
+            
+            #controls p {
+                margin: 2px 0;
+            }
         }
 
-        .date-display {
-            font-family: 'Orbitron', monospace;
-            font-size: 36px;
-            color: #90caf9;
-            margin-top: 20px;
-            letter-spacing: 4px;
-            text-shadow: 0 0 10px rgba(144, 202, 249, 0.6);
+        /* Ultra-wide screen adjustments */
+        @media (min-aspect-ratio: 21/9) {
+            #controls {
+                left: max(30px, env(safe-area-inset-left, 30px));
+            }
         }
 
-        .day-display {
-            font-size: 28px;
-            color: #fff;
-            margin-top: 10px;
-            letter-spacing: 2px;
+        /* Portrait tablet adjustments */
+        @media (min-width: 768px) and (orientation: portrait) {
+            #controls {
+                font-size: 14px;
+                padding: 18px;
+            }
         }
 
-        .seconds-display {
-            background: linear-gradient(135deg, rgba(13, 71, 161, 0.4), rgba(26, 35, 126, 0.6));
-            border: 3px solid rgba(63, 81, 181, 0.6);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 
-                0 0 30px rgba(63, 81, 181, 0.4),
-                inset 0 0 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .seconds-label {
-            font-size: 20px;
-            color: #90caf9;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .seconds-value {
-            font-family: 'Orbitron', monospace;
-            font-size: 80px;
-            font-weight: 900;
-            color: #ff5252;
-            text-shadow: 
-                0 0 15px rgba(255, 82, 82, 0.8),
-                0 0 30px rgba(255, 82, 82, 0.6);
-            letter-spacing: 6px;
-        }
-
-        .timezone-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .selector-title {
-            font-size: 24px;
-            color: #90caf9;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .timezone-buttons {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-
-        .timezone-btn {
-            background: linear-gradient(135deg, rgba(26, 35, 126, 0.5), rgba(13, 71, 161, 0.3));
-            border: 3px solid rgba(63, 81, 181, 0.5);
-            border-radius: 15px;
-            padding: 20px;
-            color: #90caf9;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            letter-spacing: 1px;
-        }
-
-        .timezone-btn:hover {
-            background: linear-gradient(135deg, rgba(63, 81, 181, 0.7), rgba(26, 35, 126, 0.5));
-            border-color: #ffd700;
-            color: #ffd700;
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .timezone-btn.active {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 152, 0, 0.2));
-            border-color: #ffd700;
-            color: #ffd700;
-            box-shadow: 
-                0 0 30px rgba(255, 215, 0, 0.6),
-                inset 0 0 20px rgba(255, 215, 0, 0.2);
-        }
-
-        .timezone-time {
-            font-size: 16px;
-            margin-top: 8px;
-            color: #fff;
-            font-family: 'Orbitron', monospace;
-        }
-
-        .info-panel {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .info-card {
-            background: rgba(26, 35, 126, 0.3);
-            border: 2px solid rgba(63, 81, 181, 0.5);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .info-title {
-            font-size: 16px;
-            color: #90caf9;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .info-value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #ffd700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            font-family: 'Noto Sans Devanagari', sans-serif;
-        }
-
+        /* Loading indicator */
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
 
-        .pulse {
-            animation: pulse 1s ease-in-out infinite;
+        .loading {
+            animation: pulse 2s ease-in-out infinite;
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <div class="models-container">
-            <div class="watch-container">
-                <canvas id="solar-canvas"></canvas>
-                <div class="canvas-label">3D Solar System</div>
-            </div>
-
-            <div class="earth-disc-container">
-                <div class="earth-disc">
-                    <canvas id="earth-disc-canvas"></canvas>
-                    <div class="disc-overlay">
-                        <div class="day-night-line" id="dayNightLine"></div>
-                    </div>
-                </div>
-                <div class="canvas-label">Earth Day/Night Disc</div>
-            </div>
-        </div>
-
-        <div class="digital-display-section">
-            <div class="main-time-display">
-                <div class="timezone-label" id="currentZoneLabel">LOCAL TIME</div>
-                <div class="time-display" id="timeDisplay">00:00</div>
-                <div class="date-display" id="dateDisplay">01/01/2024</div>
-                <div class="day-display" id="dayDisplay">MONDAY</div>
-            </div>
-
-            <div class="seconds-display">
-                <div class="seconds-label">SECONDS</div>
-                <div class="seconds-value pulse" id="secondsDisplay">00</div>
-            </div>
-
-            <div class="timezone-selector">
-                <div class="selector-title">🌍 Select Timezone</div>
-                <div class="timezone-buttons" id="timezoneButtons"></div>
-            </div>
-
-            <div class="info-panel">
-                <div class="info-card">
-                    <div class="info-title">Day Phase</div>
-                    <div class="info-value" id="dayPhase" style="font-family: 'Arial', sans-serif;">🌅 Morning</div>
-                </div>
-                <div class="info-card">
-                    <div class="info-title">Current Month</div>
-                    <div class="info-value" id="currentMonth">जनवरी</div>
-                </div>
-                <div class="info-card">
-                    <div class="info-title">Year</div>
-                    <div class="info-value" id="yearDisplay" style="font-family: 'Orbitron', monospace;">2024</div>
-                </div>
-            </div>
-        </div>
+    <canvas id="canvas"></canvas>
+    <div id="controls">
+        <h3>3D Clock Controls</h3>
+        <p>🖱️ Drag to rotate view</p>
+        <p>🔄 Auto-rotating grid</p>
+        <p>⏰ Real-time clock</p>
     </div>
 
     <script>
-        let scene, camera, renderer, sun, earth, earthOrbit;
-        let currentTimezone = 0;
-        
-        const timezones = [
-            {name: 'Local Time', offset: 'local', flag: '🏠'},
-            {name: 'New York (EST)', offset: -5, flag: '🗽'},
-            {name: 'London (GMT)', offset: 0, flag: '🇬🇧'},
-            {name: 'Paris (CET)', offset: 1, flag: '🇫🇷'},
-            {name: 'Dubai (GST)', offset: 4, flag: '🇦🇪'},
-            {name: 'Mumbai (IST)', offset: 5.5, flag: '🇮🇳'},
-            {name: 'Bangkok (ICT)', offset: 7, flag: '🇹🇭'},
-            {name: 'Tokyo (JST)', offset: 9, flag: '🇯🇵'},
-            {name: 'Sydney (AEDT)', offset: 11, flag: '🇦🇺'},
-        ];
-        
-        function init3D() {
-            scene = new THREE.Scene();
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height, centerX, centerY;
+        let mouseX = 0, mouseY = 0;
+        let isDragging = false;
+        let rotationX = -0.3;
+        let rotationY = 0.5;
+        let autoRotate = true;
+        let devicePixelRatio = window.devicePixelRatio || 1;
+
+        // Responsive sizing with device pixel ratio for crisp rendering
+        function resize() {
+            // Get actual viewport dimensions including dynamic viewport units
+            const vw = window.innerWidth || document.documentElement.clientWidth;
+            const vh = window.innerHeight || document.documentElement.clientHeight;
             
-            camera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
-            camera.position.set(0, 400, 600);
-            camera.lookAt(0, 0, 0);
+            // Set display size
+            canvas.style.width = vw + 'px';
+            canvas.style.height = vh + 'px';
             
-            renderer = new THREE.WebGLRenderer({ 
-                canvas: document.getElementById('solar-canvas'),
-                antialias: true,
-                alpha: false
-            });
-            renderer.setSize(700, 700);
-            renderer.setClearColor(0x000000, 1);
+            // Set actual canvas size with device pixel ratio for sharp rendering
+            devicePixelRatio = window.devicePixelRatio || 1;
+            width = canvas.width = vw * devicePixelRatio;
+            height = canvas.height = vh * devicePixelRatio;
             
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
-            scene.add(ambientLight);
+            // Scale context to match device pixel ratio
+            ctx.scale(devicePixelRatio, devicePixelRatio);
             
-            const sunLight = new THREE.PointLight(0xffffcc, 2, 1000);
-            sunLight.position.set(0, 0, 0);
-            scene.add(sunLight);
-            
-            const sunGeometry = new THREE.SphereGeometry(40, 32, 32);
-            const sunMaterial = new THREE.MeshBasicMaterial({ 
-                color: 0xffeb3b,
-                emissive: 0xffeb3b,
-                emissiveIntensity: 1
-            });
-            sun = new THREE.Mesh(sunGeometry, sunMaterial);
-            scene.add(sun);
-            
-            const sunGlow = new THREE.Mesh(
-                new THREE.SphereGeometry(50, 32, 32),
-                new THREE.MeshBasicMaterial({
-                    color: 0xff9800,
-                    transparent: true,
-                    opacity: 0.3
-                })
-            );
-            sun.add(sunGlow);
-            
-            earthOrbit = new THREE.Object3D();
-            scene.add(earthOrbit);
-            
-            const earthGroup = new THREE.Object3D();
-            earthOrbit.add(earthGroup);
-            
-            const earthGeometry = new THREE.SphereGeometry(60, 64, 64);
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = 2048;
-            canvas.height = 1024;
-            const ctx = canvas.getContext('2d');
-            
-            const oceanGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            oceanGradient.addColorStop(0, '#1e3a8a');
-            oceanGradient.addColorStop(0.5, '#1e88e5');
-            oceanGradient.addColorStop(1, '#1e3a8a');
-            ctx.fillStyle = oceanGradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            const continents = [
-                {x: 0.15, y: 0.35, points: [[0,0],[80,0],[100,40],[90,80],[60,100],[20,90],[0,60]]},
-                {x: 0.20, y: 0.65, points: [[0,0],[60,0],[70,50],[50,100],[20,90],[0,60]]},
-                {x: 0.45, y: 0.30, points: [[0,0],[100,0],[120,30],[100,60],[60,50],[20,40]]},
-                {x: 0.48, y: 0.55, points: [[0,0],[80,0],[90,40],[80,100],[40,110],[0,80],[10,30]]},
-                {x: 0.70, y: 0.35, points: [[0,0],[150,0],[180,40],[170,80],[140,100],[80,90],[40,70],[20,30]]},
-                {x: 0.78, y: 0.70, points: [[0,0],[100,0],[110,50],[80,70],[30,60],[0,30]]}
-            ];
-            
-            continents.forEach(cont => {
-                ctx.fillStyle = '#4caf50';
-                ctx.beginPath();
-                const startX = cont.x * canvas.width;
-                const startY = cont.y * canvas.height;
-                cont.points.forEach((p, i) => {
-                    const x = startX + p[0];
-                    const y = startY + p[1];
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                });
-                ctx.closePath();
-                ctx.fill();
-                
-                ctx.strokeStyle = '#388e3c';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-            });
-            
-            ctx.globalAlpha = 0.15;
-            ctx.fillStyle = '#ffffff';
-            for (let i = 0; i < 200; i++) {
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                const size = Math.random() * 30 + 10;
-                ctx.beginPath();
-                ctx.arc(x, y, size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            const texture = new THREE.CanvasTexture(canvas);
-            
-            const earthMaterial = new THREE.MeshPhongMaterial({ 
-                map: texture,
-                shininess: 5,
-                specular: 0x333333
-            });
-            earth = new THREE.Mesh(earthGeometry, earthMaterial);
-            earthGroup.add(earth);
-            
-            earthGroup.position.x = 250;
-            
-            const atmosphereGeometry = new THREE.SphereGeometry(65, 64, 64);
-            const atmosphereMaterial = new THREE.MeshBasicMaterial({
-                color: 0x6699ff,
-                transparent: true,
-                opacity: 0.15,
-                side: THREE.BackSide
-            });
-            const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-            earthGroup.add(atmosphere);
-            
-            const orbitGeometry = new THREE.RingGeometry(245, 255, 128);
-            const orbitMaterial = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.1,
-                side: THREE.DoubleSide
-            });
-            const orbitRing = new THREE.Mesh(orbitGeometry, orbitMaterial);
-            orbitRing.rotation.x = Math.PI / 2;
-            scene.add(orbitRing);
+            centerX = vw / 2;
+            centerY = vh / 2;
         }
+
+        resize();
         
-        const discCanvas = document.getElementById('earth-disc-canvas');
-        const discCtx = discCanvas.getContext('2d');
-        discCanvas.width = 500;
-        discCanvas.height = 500;
-        
-        function drawEarthDisc(timeInZone) {
-            const centerX = discCanvas.width / 2;
-            const centerY = discCanvas.height / 2;
-            const radius = 230;
-            
-            discCtx.clearRect(0, 0, discCanvas.width, discCanvas.height);
-            
-            const nightGradient = discCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-            nightGradient.addColorStop(0, '#1a237e');
-            nightGradient.addColorStop(0.5, '#0d47a1');
-            nightGradient.addColorStop(1, '#01579b');
-            
-            discCtx.fillStyle = nightGradient;
-            discCtx.beginPath();
-            discCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            discCtx.fill();
-            
-            const hours = timeInZone.getHours();
-            const minutes = timeInZone.getMinutes();
-            const totalMinutes = hours * 60 + minutes;
-            const dayProgress = totalMinutes / 1440;
-            const rotationAngle = dayProgress * Math.PI * 2 - Math.PI / 2;
-            
-            discCtx.save();
-            discCtx.beginPath();
-            discCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            discCtx.clip();
-            
-            discCtx.translate(centerX, centerY);
-            discCtx.rotate(rotationAngle);
-            discCtx.translate(-centerX, -centerY);
-            
-            const dayGradient = discCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-            dayGradient.addColorStop(0, '#42a5f5');
-            dayGradient.addColorStop(0.5, '#1e88e5');
-            dayGradient.addColorStop(1, '#1565c0');
-            
-            discCtx.fillStyle = dayGradient;
-            discCtx.beginPath();
-            discCtx.arc(centerX, centerY, radius, -Math.PI / 2, Math.PI / 2);
-            discCtx.closePath();
-            discCtx.fill();
-            
-            discCtx.restore();
-            
-            discCtx.save();
-            discCtx.beginPath();
-            discCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            discCtx.clip();
-            
-            discCtx.translate(centerX, centerY);
-            discCtx.rotate(rotationAngle);
-            
-            const continents = [
-                {x: 0.15, y: 0.35, points: [[0,0],[80,0],[100,40],[90,80],[60,100],[20,90],[0,60]]},
-                {x: 0.20, y: 0.65, points: [[0,0],[60,0],[70,50],[50,100],[20,90],[0,60]]},
-                {x: 0.45, y: 0.30, points: [[0,0],[100,0],[120,30],[100,60],[60,50],[20,40]]},
-                {x: 0.48, y: 0.55, points: [[0,0],[80,0],[90,40],[80,100],[40,110],[0,80],[10,30]]},
-                {x: 0.70, y: 0.35, points: [[0,0],[150,0],[180,40],[170,80],[140,100],[80,90],[40,70],[20,30]]},
-                {x: 0.78, y: 0.70, points: [[0,0],[100,0],[110,50],[80,70],[30,60],[0,30]]}
-            ];
-            
-            continents.forEach(cont => {
-                const x = (cont.x - 0.5) * radius * 2;
-                const y = (cont.y - 0.5) * radius * 2;
-                
-                discCtx.fillStyle = '#4caf50';
-                discCtx.beginPath();
-                cont.points.forEach((p, i) => {
-                    const px = x + p[0];
-                    const py = y + p[1];
-                    if (i === 0) discCtx.moveTo(px, py);
-                    else discCtx.lineTo(px, py);
-                });
-                discCtx.closePath();
-                discCtx.fill();
-            });
-            
-            discCtx.restore();
-            
-            const lineAngle = (rotationAngle + Math.PI / 2) * (180 / Math.PI);
-            document.getElementById('dayNightLine').style.transform = `translateX(-50%) rotate(${lineAngle}deg)`;
-        }
-        
-        function animate3D() {
-            requestAnimationFrame(animate3D);
-            
-            const selectedZone = timezones[currentTimezone];
-            const timeInZone = getTimeInZone(selectedZone.offset);
-            
-            const hours = timeInZone.getHours();
-            const minutes = timeInZone.getMinutes();
-            const seconds = timeInZone.getSeconds();
-            const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-            const dayProgress = totalSeconds / 86400;
-            
-            earth.rotation.y = dayProgress * Math.PI * 2;
-            
-            const monthProgress = (timeInZone.getMonth() + (timeInZone.getDate() / 31)) / 12;
-            earthOrbit.rotation.y = monthProgress * Math.PI * 2;
-            
-            sun.rotation.y += 0.002;
-            
-            renderer.render(scene, camera);
-        }
-        
-        init3D();
-        animate3D();
-        
-        const timezoneButtonsContainer = document.getElementById('timezoneButtons');
-        timezones.forEach((tz, index) => {
-            const btn = document.createElement('div');
-            btn.className = 'timezone-btn';
-            if (index === 0) btn.classList.add('active');
-            btn.innerHTML = `
-                <div>${tz.flag} ${tz.name.split('(')[0].trim()}</div>
-                <div class="timezone-time" id="tz-${index}">--:--:--</div>
-            `;
-            btn.onclick = () => selectTimezone(index);
-            timezoneButtonsContainer.appendChild(btn);
+        // Handle resize with debounce for performance
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(resize, 100);
         });
-        
-        function selectTimezone(index) {
-            currentTimezone = index;
-            document.querySelectorAll('.timezone-btn').forEach((btn, i) => {
-                btn.classList.toggle('active', i === index);
-            });
-            updateClock();
-        }
-        
-        const monthsHindi = ['जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'];
-        const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-        
-        function getTimeInZone(offset) {
-            const now = new Date();
-            if (offset === 'local') {
-                return now;
+
+        // Handle orientation change
+        window.addEventListener('orientationchange', () => {
+            setTimeout(resize, 100);
+        });
+
+        // Mouse controls
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            autoRotate = false;
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                rotationY += e.movementX * 0.005;
+                rotationX += e.movementY * 0.005;
+                rotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationX));
             }
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            return new Date(utc + (3600000 * offset));
-        }
+        });
+
+        // Enhanced touch controls with multi-touch support
+        let lastTouchX = 0, lastTouchY = 0;
+        let touchStartTime = 0;
         
-        function updateClock() {
-            const selectedZone = timezones[currentTimezone];
-            const now = getTimeInZone(selectedZone.offset);
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                autoRotate = false;
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+                touchStartTime = Date.now();
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            isDragging = false;
             
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            document.getElementById('timeDisplay').textContent = `${hours}:${minutes}`;
-            document.getElementById('secondsDisplay').textContent = seconds;
-            
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = now.getFullYear();
-            document.getElementById('dateDisplay').textContent = `${day}/${month}/${year}`;
-            document.getElementById('dayDisplay').textContent = days[now.getDay()];
-            document.getElementById('yearDisplay').textContent = year;
-            
-            document.getElementById('currentZoneLabel').textContent = selectedZone.name.toUpperCase();
-            
-            const currentHour = now.getHours();
-            let phase = '';
-            if (currentHour >= 5 && currentHour < 12) phase = '🌅 Morning';
-            else if (currentHour >= 12 && currentHour < 17) phase = '☀️ Afternoon';
-            else if (currentHour >= 17 && currentHour < 20) phase = '🌆 Evening';
-            else phase = '🌙 Night';
-            document.getElementById('dayPhase').textContent = phase;
-            
-            const monthIndex = now.getMonth();
-            document.getElementById('currentMonth').textContent = monthsHindi[monthIndex];
-            
-            drawEarthDisc(now);
-            
-            timezones.forEach((tz, index) => {
-                const elem = document.getElementById(`tz-${index}`);
-                if (elem) {
-                    const zoneTime = getTimeInZone(tz.offset);
-                    elem.textContent = zoneTime.toLocaleTimeString('en-US', { 
-                        hour: '2-digit', 
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: false 
-                    });
+            // Double-tap to reset auto-rotate
+            if (Date.now() - touchStartTime < 300 && e.changedTouches.length === 1) {
+                autoRotate = true;
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (isDragging && e.touches.length === 1) {
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
+                const deltaX = touchX - lastTouchX;
+                const deltaY = touchY - lastTouchY;
+                
+                rotationY += deltaX * 0.005;
+                rotationX += deltaY * 0.005;
+                rotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationX));
+                
+                lastTouchX = touchX;
+                lastTouchY = touchY;
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+        // Prevent context menu on long press
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // 3D projection with adaptive FOV based on screen size
+        function project(x, y, z) {
+            const minDimension = Math.min(width / devicePixelRatio, height / devicePixelRatio);
+            const fov = minDimension * 0.8; // Adaptive field of view
+            const scale = fov / (fov + z);
+            return {
+                x: centerX + x * scale,
+                y: centerY + y * scale,
+                scale: scale
+            };
+        }
+
+        // Rotate point in 3D space
+        function rotate3D(x, y, z, rx, ry) {
+            // Rotate around Y axis
+            let cosY = Math.cos(ry);
+            let sinY = Math.sin(ry);
+            let tempX = x * cosY - z * sinY;
+            let tempZ = x * sinY + z * cosY;
+            x = tempX;
+            z = tempZ;
+
+            // Rotate around X axis
+            let cosX = Math.cos(rx);
+            let sinX = Math.sin(rx);
+            let tempY = y * cosX - z * sinX;
+            tempZ = y * sinX + z * cosX;
+            y = tempY;
+            z = tempZ;
+
+            return { x, y, z };
+        }
+
+        // Draw 3D grid with responsive sizing
+        function drawGrid() {
+            const minDimension = Math.min(width / devicePixelRatio, height / devicePixelRatio);
+            const gridSize = 12;
+            const spacing = minDimension * 0.1; // Responsive spacing
+            const offset = (gridSize - 1) * spacing / 2;
+
+            ctx.strokeStyle = '#1a4d7a';
+            ctx.lineWidth = Math.max(0.5, minDimension / 800);
+
+            // Draw grid lines with optimized rendering
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    // Horizontal lines (floor)
+                    drawLine3D(
+                        i * spacing - offset, -offset, j * spacing - offset,
+                        i * spacing - offset, -offset, (j + 1) * spacing - offset
+                    );
+                    drawLine3D(
+                        i * spacing - offset, -offset, j * spacing - offset,
+                        (i + 1) * spacing - offset, -offset, j * spacing - offset
+                    );
+
+                    // Vertical lines (walls)
+                    drawLine3D(
+                        -offset, i * spacing - offset, j * spacing - offset,
+                        -offset, i * spacing - offset, (j + 1) * spacing - offset
+                    );
+                    drawLine3D(
+                        offset, i * spacing - offset, j * spacing - offset,
+                        offset, i * spacing - offset, (j + 1) * spacing - offset
+                    );
+
+                    // Back wall lines
+                    drawLine3D(
+                        i * spacing - offset, j * spacing - offset, offset,
+                        (i + 1) * spacing - offset, j * spacing - offset, offset
+                    );
+                    drawLine3D(
+                        i * spacing - offset, j * spacing - offset, offset,
+                        i * spacing - offset, (j + 1) * spacing - offset, offset
+                    );
                 }
-            });
+            }
+
+            // Draw grid nodes
+            ctx.fillStyle = '#4da6ff';
+            const nodeRadius = Math.max(2, minDimension / 300);
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    for (let k = 0; k < gridSize; k++) {
+                        if (i === 0 || i === gridSize - 1 || j === 0 || j === gridSize - 1 || k === 0 || k === gridSize - 1) {
+                            drawNode3D(i * spacing - offset, j * spacing - offset, k * spacing - offset, nodeRadius);
+                        }
+                    }
+                }
+            }
         }
-        
-        updateClock();
-        setInterval(updateClock, 1000);
+
+        function drawLine3D(x1, y1, z1, x2, y2, z2) {
+            let p1 = rotate3D(x1, y1, z1, rotationX, rotationY);
+            let p2 = rotate3D(x2, y2, z2, rotationX, rotationY);
+
+            if (p1.z < -100 || p2.z < -100) return;
+
+            let proj1 = project(p1.x, p1.y, p1.z);
+            let proj2 = project(p2.x, p2.y, p2.z);
+
+            ctx.beginPath();
+            ctx.moveTo(proj1.x, proj1.y);
+            ctx.lineTo(proj2.x, proj2.y);
+            ctx.stroke();
+        }
+
+        function drawNode3D(x, y, z, radius) {
+            let p = rotate3D(x, y, z, rotationX, rotationY);
+            if (p.z < -100) return;
+
+            let proj = project(p.x, p.y, p.z);
+            ctx.beginPath();
+            ctx.arc(proj.x, proj.y, radius * proj.scale, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Draw 3D analog clock with responsive sizing
+        function drawClock() {
+            const minDimension = Math.min(width / devicePixelRatio, height / devicePixelRatio);
+            const clockRadius = minDimension * 0.15; // Responsive clock size
+            const clockDepth = clockRadius * 0.25;
+            const now = new Date();
+            const hours = now.getHours() % 12;
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            const milliseconds = now.getMilliseconds();
+
+            // Smooth second hand movement
+            const smoothSeconds = seconds + milliseconds / 1000;
+
+            // Clock face (front)
+            drawClockFace(0, 0, 0, clockRadius);
+
+            // Clock face (back for depth)
+            drawClockFace(0, 0, clockDepth, clockRadius, true);
+
+            // Clock edge
+            drawClockEdge(0, 0, 0, clockRadius, clockDepth);
+
+            // Hour markers
+            const markerWidth = Math.max(2, clockRadius / 40);
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * 30 - 90) * Math.PI / 180;
+                const outerRadius = clockRadius * 0.85;
+                const innerRadius = clockRadius * 0.75;
+                const x1 = Math.cos(angle) * innerRadius;
+                const y1 = Math.sin(angle) * innerRadius;
+                const x2 = Math.cos(angle) * outerRadius;
+                const y2 = Math.sin(angle) * outerRadius;
+                
+                ctx.strokeStyle = '#4da6ff';
+                ctx.lineWidth = markerWidth;
+                drawLine3D(x1, y1, -5, x2, y2, -5);
+            }
+
+            // Hour hand
+            const hourAngle = ((hours + minutes / 60) * 30 - 90) * Math.PI / 180;
+            const hourLength = clockRadius * 0.5;
+            drawClockHand(hourAngle, hourLength, Math.max(4, clockRadius / 20), '#66b3ff');
+
+            // Minute hand
+            const minuteAngle = ((minutes + smoothSeconds / 60) * 6 - 90) * Math.PI / 180;
+            const minuteLength = clockRadius * 0.7;
+            drawClockHand(minuteAngle, minuteLength, Math.max(3, clockRadius / 30), '#80c0ff');
+
+            // Second hand
+            const secondAngle = (smoothSeconds * 6 - 90) * Math.PI / 180;
+            const secondLength = clockRadius * 0.8;
+            drawClockHand(secondAngle, secondLength, Math.max(1.5, clockRadius / 60), '#ff6b6b');
+
+            // Center dot
+            drawNode3D(0, 0, -5, Math.max(6, clockRadius / 15));
+        }
+
+        function drawClockFace(cx, cy, cz, radius, isBack = false) {
+            const segments = 64;
+            const points = [];
+
+            for (let i = 0; i <= segments; i++) {
+                const angle = (i / segments) * Math.PI * 2;
+                const x = cx + Math.cos(angle) * radius;
+                const y = cy + Math.sin(angle) * radius;
+                const p = rotate3D(x, y, cz, rotationX, rotationY);
+                if (p.z >= -100) {
+                    points.push(project(p.x, p.y, p.z));
+                }
+            }
+
+            if (points.length > 2) {
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = isBack ? 'rgba(10, 30, 50, 0.8)' : 'rgba(10, 30, 50, 0.95)';
+                ctx.fill();
+                ctx.strokeStyle = '#4da6ff';
+                ctx.lineWidth = Math.max(1.5, radius / 80);
+                ctx.stroke();
+            }
+        }
+
+        function drawClockEdge(cx, cy, cz, radius, depth) {
+            const segments = 32;
+            ctx.strokeStyle = '#2d5a7a';
+            ctx.lineWidth = Math.max(0.8, radius / 120);
+
+            for (let i = 0; i < segments; i++) {
+                const angle = (i / segments) * Math.PI * 2;
+                const x = cx + Math.cos(angle) * radius;
+                const y = cy + Math.sin(angle) * radius;
+                drawLine3D(x, y, cz, x, y, cz + depth);
+            }
+        }
+
+        function drawClockHand(angle, length, width, color) {
+            const x = Math.cos(angle) * length;
+            const y = Math.sin(angle) * length;
+            
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.lineCap = 'round';
+            drawLine3D(0, 0, -5, x, y, -5);
+        }
+
+        // Animation loop with performance optimization
+        let lastFrameTime = 0;
+        function animate(timestamp) {
+            const deltaTime = timestamp - lastFrameTime;
+            lastFrameTime = timestamp;
+
+            ctx.fillStyle = '#0a0e1a';
+            ctx.fillRect(0, 0, width / devicePixelRatio, height / devicePixelRatio);
+
+            if (autoRotate) {
+                rotationY += 0.003;
+            }
+
+            drawGrid();
+            drawClock();
+
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        requestAnimationFrame(animate);
     </script>
 </body>
 </html>
