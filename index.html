@@ -3,18 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>Periodic Table - Homologous Series</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --royal-blue: #4169E1;
-            --royal-green: #00703C;
-            --royal-red: #E0115F;
-            --bg-primary: #1a1a2e;
-            --bg-secondary: #16213e;
-            --text-primary: #ffffff;
-            --text-secondary: #a8b2d1;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --bg-primary: #0a0e17;
+            --bg-secondary: #12182b;
+            --accent-cyan: #00f0ff;
+            --accent-magenta: #ff00aa;
+            --accent-yellow: #ffed4e;
+            --accent-green: #00ff88;
+            --accent-orange: #ff6b35;
+            --text-primary: #e8edf5;
+            --text-dim: #7a8caa;
+            
+            --alkali: #ff4757;
+            --alkaline: #ffa502;
+            --transition: #48dbfb;
+            --post-transition: #1dd1a1;
+            --metalloid: #ee5a6f;
+            --nonmetal: #ffd32a;
+            --halogen: #ff6348;
+            --noble: #c56cf0;
+            --lanthanide: #3867d6;
+            --actinide: #8854d0;
         }
 
         * {
@@ -24,484 +36,717 @@
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #2d3561 50%, var(--royal-blue) 100%);
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 170, 0.06) 0%, transparent 50%);
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(65, 105, 225, 0.08) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
-            pointer-events: none;
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
 
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
-
-        .calculator {
-            background: var(--bg-secondary);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: var(--shadow), 0 0 80px rgba(65, 105, 225, 0.2);
-            max-width: 400px;
-            width: 100%;
+        header {
+            text-align: center;
+            margin-bottom: 50px;
             position: relative;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            animation: fadeIn 0.6s ease-out;
         }
 
-        @keyframes fadeIn {
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta), var(--accent-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
             from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
+                filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.5));
             }
             to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
+                filter: drop-shadow(0 0 40px rgba(255, 0, 170, 0.7));
             }
         }
 
-        .calculator::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--royal-blue), transparent);
-            opacity: 0.5;
-        }
-
-        .display {
-            background: var(--bg-primary);
-            border-radius: 16px;
-            padding: 28px 24px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .display::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background: linear-gradient(135deg, transparent, rgba(65, 105, 225, 0.03));
-            pointer-events: none;
-        }
-
-        .expression {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 16px;
-            color: var(--text-secondary);
-            min-height: 24px;
-            text-align: right;
-            margin-bottom: 8px;
+        .subtitle {
+            font-size: 1.4rem;
+            color: var(--text-dim);
             font-weight: 300;
-            letter-spacing: 0.5px;
+            letter-spacing: 2px;
         }
 
-        .result {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 48px;
-            color: var(--text-primary);
-            text-align: right;
-            font-weight: 300;
-            letter-spacing: -1px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
         }
 
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        button {
-            font-family: 'Outfit', sans-serif;
-            font-size: 20px;
-            font-weight: 500;
-            padding: 24px;
-            border: none;
-            border-radius: 16px;
+        .series-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            border-radius: 4px;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, rgba(65, 105, 225, 0.4), rgba(65, 105, 225, 0.25));
-            color: var(--text-primary);
-            border: 1px solid rgba(65, 105, 225, 0.5);
-            box-shadow: 
-                0 8px 0 rgba(65, 105, 225, 0.3),
-                0 12px 20px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transform: translateY(0);
         }
 
-        button::before {
+        .series-btn::before {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             width: 0;
             height: 0;
+            background: var(--accent-cyan);
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
             transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            transition: width 0.5s, height 0.5s;
+            z-index: -1;
         }
 
-        button:active::before {
+        .series-btn:hover::before {
             width: 300px;
             height: 300px;
         }
 
-        button:hover {
+        .series-btn:hover {
+            color: var(--bg-primary);
             transform: translateY(-2px);
-            box-shadow: 
-                0 10px 0 rgba(65, 105, 225, 0.35),
-                0 16px 24px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.4);
         }
 
-        button:active {
-            transform: translateY(6px);
-            box-shadow: 
-                0 2px 0 rgba(65, 105, 225, 0.25),
-                0 4px 8px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        .series-btn.active {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
         }
 
-        .operator {
-            background: linear-gradient(135deg, rgba(224, 17, 95, 0.4), rgba(224, 17, 95, 0.25));
-            color: #ff90b8;
-            font-weight: 600;
-            border-color: rgba(224, 17, 95, 0.5);
-            box-shadow: 
-                0 8px 0 rgba(224, 17, 95, 0.3),
-                0 12px 20px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 1fr);
+            gap: 4px;
+            margin-bottom: 40px;
         }
 
-        .operator:hover {
-            background: linear-gradient(135deg, rgba(224, 17, 95, 0.5), rgba(224, 17, 95, 0.35));
-            border-color: rgba(224, 17, 95, 0.6);
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 0 rgba(224, 17, 95, 0.35),
-                0 16px 24px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        .element {
+            aspect-ratio: 1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-secondary);
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .operator:active {
-            transform: translateY(6px);
-            box-shadow: 
-                0 2px 0 rgba(224, 17, 95, 0.25),
-                0 4px 8px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        .element::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .equals {
-            background: linear-gradient(135deg, var(--royal-green), #005a2f);
-            color: #ffffff;
+        .element:hover::before {
+            opacity: 1;
+        }
+
+        .element:hover {
+            transform: scale(1.15) translateY(-5px);
+            z-index: 10;
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.4);
+            border-color: var(--accent-cyan);
+        }
+
+        .atomic-number {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+
+        .symbol {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
             font-weight: 700;
-            border-color: rgba(0, 112, 60, 0.6);
-            box-shadow: 
-                0 8px 0 rgba(0, 112, 60, 0.5),
-                0 12px 24px rgba(0, 112, 60, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-align: center;
+            margin: 5px 0;
+            letter-spacing: 1px;
         }
 
-        .equals:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 0 rgba(0, 112, 60, 0.6),
-                0 16px 28px rgba(0, 112, 60, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        .name {
+            font-size: 0.65rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-weight: 300;
         }
 
-        .equals:active {
-            transform: translateY(6px);
-            box-shadow: 
-                0 2px 0 rgba(0, 112, 60, 0.4),
-                0 4px 10px rgba(0, 112, 60, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        .mass {
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            text-align: center;
+            font-weight: 300;
         }
 
-        .clear {
-            background: linear-gradient(135deg, rgba(224, 17, 95, 0.45), rgba(224, 17, 95, 0.3));
-            color: #ff90b8;
-            font-weight: 600;
-            border-color: rgba(224, 17, 95, 0.6);
-            box-shadow: 
-                0 8px 0 rgba(224, 17, 95, 0.35),
-                0 12px 20px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        .empty {
+            border: none;
+            background: transparent;
         }
 
-        .clear:hover {
-            background: linear-gradient(135deg, rgba(224, 17, 95, 0.55), rgba(224, 17, 95, 0.4));
-            border-color: rgba(224, 17, 95, 0.7);
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 0 rgba(224, 17, 95, 0.4),
-                0 16px 24px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        .empty:hover {
+            transform: none;
+            box-shadow: none;
         }
 
-        .clear:active {
-            transform: translateY(6px);
-            box-shadow: 
-                0 2px 0 rgba(224, 17, 95, 0.3),
-                0 4px 8px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .zero {
-            grid-column: span 2;
-        }
-
-        @media (max-width: 480px) {
-            .calculator {
-                padding: 24px;
-            }
-
-            .result {
-                font-size: 36px;
-            }
-
-            button {
-                padding: 20px;
-                font-size: 18px;
-            }
-
-            .buttons {
-                gap: 10px;
-            }
+        .highlighted {
+            animation: pulse 1.5s ease-in-out infinite;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.2);
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 240, 255, 0.8), inset 0 0 30px rgba(0, 240, 255, 0.4);
+            }
         }
 
-        .calculating {
-            animation: pulse 1s ease-in-out;
+        .alkali-metal { background: linear-gradient(135deg, var(--alkali), rgba(255, 71, 87, 0.7)); }
+        .alkaline-earth { background: linear-gradient(135deg, var(--alkaline), rgba(255, 165, 2, 0.7)); }
+        .transition-metal { background: linear-gradient(135deg, var(--transition), rgba(72, 219, 251, 0.7)); }
+        .post-transition { background: linear-gradient(135deg, var(--post-transition), rgba(29, 209, 161, 0.7)); }
+        .metalloid { background: linear-gradient(135deg, var(--metalloid), rgba(238, 90, 111, 0.7)); }
+        .nonmetal { background: linear-gradient(135deg, var(--nonmetal), rgba(255, 211, 42, 0.7)); }
+        .halogen { background: linear-gradient(135deg, var(--halogen), rgba(255, 99, 72, 0.7)); }
+        .noble-gas { background: linear-gradient(135deg, var(--noble), rgba(197, 108, 240, 0.7)); }
+        .lanthanide { background: linear-gradient(135deg, var(--lanthanide), rgba(56, 103, 214, 0.7)); }
+        .actinide { background: linear-gradient(135deg, var(--actinide), rgba(136, 84, 208, 0.7)); }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(18, 24, 43, 0.6);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .legend-label {
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .info-panel {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(18, 24, 43, 0.8);
+            border-radius: 10px;
+            border: 2px solid var(--accent-cyan);
+            min-height: 150px;
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.2);
+        }
+
+        .info-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .info-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .series-examples {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 240, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-cyan);
+        }
+
+        .series-examples h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-yellow);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .series-examples ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .series-examples li {
+            padding: 8px 0;
+            font-size: 1rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .series-examples li:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 1400px) {
+            h1 { font-size: 3rem; }
+            .symbol { font-size: 1.2rem; }
+            .name { font-size: 0.6rem; }
+        }
+
+        @media (max-width: 1000px) {
+            h1 { font-size: 2.5rem; }
+            .periodic-table { gap: 2px; }
+            .element { padding: 6px; }
+            .symbol { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <div class="display">
-            <div class="expression" id="expression"></div>
-            <div class="result" id="result">0</div>
+    <div class="container">
+        <header>
+            <h1>Periodic Table</h1>
+            <p class="subtitle">Homologous Series Interactive Explorer</p>
+        </header>
+
+        <div class="controls">
+            <button class="series-btn" data-series="alkali">Alkali Metals</button>
+            <button class="series-btn" data-series="alkaline">Alkaline Earth</button>
+            <button class="series-btn" data-series="halogens">Halogens</button>
+            <button class="series-btn" data-series="noble">Noble Gases</button>
+            <button class="series-btn" data-series="transition">Transition Metals</button>
+            <button class="series-btn" data-series="lanthanides">Lanthanides</button>
+            <button class="series-btn" data-series="actinides">Actinides</button>
+            <button class="series-btn" data-series="reset">Reset</button>
         </div>
-        <div class="buttons">
-            <button class="clear" onclick="clearAll()">AC</button>
-            <button class="operator" onclick="deleteLast()">⌫</button>
-            <button class="operator" onclick="appendOperator('%')">%</button>
-            <button class="operator" onclick="appendOperator('/')">÷</button>
-            
-            <button class="number" onclick="appendNumber('7')">7</button>
-            <button class="number" onclick="appendNumber('8')">8</button>
-            <button class="number" onclick="appendNumber('9')">9</button>
-            <button class="operator" onclick="appendOperator('*')">×</button>
-            
-            <button class="number" onclick="appendNumber('4')">4</button>
-            <button class="number" onclick="appendNumber('5')">5</button>
-            <button class="number" onclick="appendNumber('6')">6</button>
-            <button class="operator" onclick="appendOperator('-')">−</button>
-            
-            <button class="number" onclick="appendNumber('1')">1</button>
-            <button class="number" onclick="appendNumber('2')">2</button>
-            <button class="number" onclick="appendNumber('3')">3</button>
-            <button class="operator" onclick="appendOperator('+')">+</button>
-            
-            <button class="number zero" onclick="appendNumber('0')">0</button>
-            <button class="number" onclick="appendNumber('.')">.</button>
-            <button class="equals" onclick="calculate()">=</button>
+
+        <div class="periodic-table" id="periodicTable"></div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color alkali-metal"></div>
+                <span class="legend-label">Alkali Metals</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color alkaline-earth"></div>
+                <span class="legend-label">Alkaline Earth</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color transition-metal"></div>
+                <span class="legend-label">Transition Metals</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color post-transition"></div>
+                <span class="legend-label">Post-Transition</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color metalloid"></div>
+                <span class="legend-label">Metalloids</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color nonmetal"></div>
+                <span class="legend-label">Nonmetals</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color halogen"></div>
+                <span class="legend-label">Halogens</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color noble-gas"></div>
+                <span class="legend-label">Noble Gases</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color lanthanide"></div>
+                <span class="legend-label">Lanthanides</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color actinide"></div>
+                <span class="legend-label">Actinides</span>
+            </div>
+        </div>
+
+        <div class="info-panel" id="infoPanel">
+            <div class="info-title">Select a homologous series to explore</div>
+            <div class="info-content">
+                Click on any of the buttons above to highlight elements in the same homologous series. 
+                Homologous series are groups of elements with similar chemical properties due to their position 
+                in the periodic table and similar electron configurations.
+            </div>
         </div>
     </div>
 
     <script>
-        let currentExpression = '';
-        let displayValue = '0';
-        let lastResult = null;
+        const elements = [
+            {num: 1, symbol: 'H', name: 'Hydrogen', mass: '1.008', type: 'nonmetal', row: 1, col: 1},
+            {num: 2, symbol: 'He', name: 'Helium', mass: '4.003', type: 'noble-gas', row: 1, col: 18},
+            {num: 3, symbol: 'Li', name: 'Lithium', mass: '6.941', type: 'alkali-metal', row: 2, col: 1},
+            {num: 4, symbol: 'Be', name: 'Beryllium', mass: '9.012', type: 'alkaline-earth', row: 2, col: 2},
+            {num: 5, symbol: 'B', name: 'Boron', mass: '10.81', type: 'metalloid', row: 2, col: 13},
+            {num: 6, symbol: 'C', name: 'Carbon', mass: '12.01', type: 'nonmetal', row: 2, col: 14},
+            {num: 7, symbol: 'N', name: 'Nitrogen', mass: '14.01', type: 'nonmetal', row: 2, col: 15},
+            {num: 8, symbol: 'O', name: 'Oxygen', mass: '16.00', type: 'nonmetal', row: 2, col: 16},
+            {num: 9, symbol: 'F', name: 'Fluorine', mass: '19.00', type: 'halogen', row: 2, col: 17},
+            {num: 10, symbol: 'Ne', name: 'Neon', mass: '20.18', type: 'noble-gas', row: 2, col: 18},
+            {num: 11, symbol: 'Na', name: 'Sodium', mass: '22.99', type: 'alkali-metal', row: 3, col: 1},
+            {num: 12, symbol: 'Mg', name: 'Magnesium', mass: '24.31', type: 'alkaline-earth', row: 3, col: 2},
+            {num: 13, symbol: 'Al', name: 'Aluminum', mass: '26.98', type: 'post-transition', row: 3, col: 13},
+            {num: 14, symbol: 'Si', name: 'Silicon', mass: '28.09', type: 'metalloid', row: 3, col: 14},
+            {num: 15, symbol: 'P', name: 'Phosphorus', mass: '30.97', type: 'nonmetal', row: 3, col: 15},
+            {num: 16, symbol: 'S', name: 'Sulfur', mass: '32.07', type: 'nonmetal', row: 3, col: 16},
+            {num: 17, symbol: 'Cl', name: 'Chlorine', mass: '35.45', type: 'halogen', row: 3, col: 17},
+            {num: 18, symbol: 'Ar', name: 'Argon', mass: '39.95', type: 'noble-gas', row: 3, col: 18},
+            {num: 19, symbol: 'K', name: 'Potassium', mass: '39.10', type: 'alkali-metal', row: 4, col: 1},
+            {num: 20, symbol: 'Ca', name: 'Calcium', mass: '40.08', type: 'alkaline-earth', row: 4, col: 2},
+            {num: 21, symbol: 'Sc', name: 'Scandium', mass: '44.96', type: 'transition-metal', row: 4, col: 3},
+            {num: 22, symbol: 'Ti', name: 'Titanium', mass: '47.87', type: 'transition-metal', row: 4, col: 4},
+            {num: 23, symbol: 'V', name: 'Vanadium', mass: '50.94', type: 'transition-metal', row: 4, col: 5},
+            {num: 24, symbol: 'Cr', name: 'Chromium', mass: '52.00', type: 'transition-metal', row: 4, col: 6},
+            {num: 25, symbol: 'Mn', name: 'Manganese', mass: '54.94', type: 'transition-metal', row: 4, col: 7},
+            {num: 26, symbol: 'Fe', name: 'Iron', mass: '55.85', type: 'transition-metal', row: 4, col: 8},
+            {num: 27, symbol: 'Co', name: 'Cobalt', mass: '58.93', type: 'transition-metal', row: 4, col: 9},
+            {num: 28, symbol: 'Ni', name: 'Nickel', mass: '58.69', type: 'transition-metal', row: 4, col: 10},
+            {num: 29, symbol: 'Cu', name: 'Copper', mass: '63.55', type: 'transition-metal', row: 4, col: 11},
+            {num: 30, symbol: 'Zn', name: 'Zinc', mass: '65.38', type: 'transition-metal', row: 4, col: 12},
+            {num: 31, symbol: 'Ga', name: 'Gallium', mass: '69.72', type: 'post-transition', row: 4, col: 13},
+            {num: 32, symbol: 'Ge', name: 'Germanium', mass: '72.63', type: 'metalloid', row: 4, col: 14},
+            {num: 33, symbol: 'As', name: 'Arsenic', mass: '74.92', type: 'metalloid', row: 4, col: 15},
+            {num: 34, symbol: 'Se', name: 'Selenium', mass: '78.97', type: 'nonmetal', row: 4, col: 16},
+            {num: 35, symbol: 'Br', name: 'Bromine', mass: '79.90', type: 'halogen', row: 4, col: 17},
+            {num: 36, symbol: 'Kr', name: 'Krypton', mass: '83.80', type: 'noble-gas', row: 4, col: 18},
+            {num: 37, symbol: 'Rb', name: 'Rubidium', mass: '85.47', type: 'alkali-metal', row: 5, col: 1},
+            {num: 38, symbol: 'Sr', name: 'Strontium', mass: '87.62', type: 'alkaline-earth', row: 5, col: 2},
+            {num: 39, symbol: 'Y', name: 'Yttrium', mass: '88.91', type: 'transition-metal', row: 5, col: 3},
+            {num: 40, symbol: 'Zr', name: 'Zirconium', mass: '91.22', type: 'transition-metal', row: 5, col: 4},
+            {num: 41, symbol: 'Nb', name: 'Niobium', mass: '92.91', type: 'transition-metal', row: 5, col: 5},
+            {num: 42, symbol: 'Mo', name: 'Molybdenum', mass: '95.95', type: 'transition-metal', row: 5, col: 6},
+            {num: 43, symbol: 'Tc', name: 'Technetium', mass: '98', type: 'transition-metal', row: 5, col: 7},
+            {num: 44, symbol: 'Ru', name: 'Ruthenium', mass: '101.1', type: 'transition-metal', row: 5, col: 8},
+            {num: 45, symbol: 'Rh', name: 'Rhodium', mass: '102.9', type: 'transition-metal', row: 5, col: 9},
+            {num: 46, symbol: 'Pd', name: 'Palladium', mass: '106.4', type: 'transition-metal', row: 5, col: 10},
+            {num: 47, symbol: 'Ag', name: 'Silver', mass: '107.9', type: 'transition-metal', row: 5, col: 11},
+            {num: 48, symbol: 'Cd', name: 'Cadmium', mass: '112.4', type: 'transition-metal', row: 5, col: 12},
+            {num: 49, symbol: 'In', name: 'Indium', mass: '114.8', type: 'post-transition', row: 5, col: 13},
+            {num: 50, symbol: 'Sn', name: 'Tin', mass: '118.7', type: 'post-transition', row: 5, col: 14},
+            {num: 51, symbol: 'Sb', name: 'Antimony', mass: '121.8', type: 'metalloid', row: 5, col: 15},
+            {num: 52, symbol: 'Te', name: 'Tellurium', mass: '127.6', type: 'metalloid', row: 5, col: 16},
+            {num: 53, symbol: 'I', name: 'Iodine', mass: '126.9', type: 'halogen', row: 5, col: 17},
+            {num: 54, symbol: 'Xe', name: 'Xenon', mass: '131.3', type: 'noble-gas', row: 5, col: 18},
+            {num: 55, symbol: 'Cs', name: 'Cesium', mass: '132.9', type: 'alkali-metal', row: 6, col: 1},
+            {num: 56, symbol: 'Ba', name: 'Barium', mass: '137.3', type: 'alkaline-earth', row: 6, col: 2},
+            {num: 57, symbol: 'La', name: 'Lanthanum', mass: '138.9', type: 'lanthanide', row: 6, col: 3},
+            {num: 72, symbol: 'Hf', name: 'Hafnium', mass: '178.5', type: 'transition-metal', row: 6, col: 4},
+            {num: 73, symbol: 'Ta', name: 'Tantalum', mass: '180.9', type: 'transition-metal', row: 6, col: 5},
+            {num: 74, symbol: 'W', name: 'Tungsten', mass: '183.8', type: 'transition-metal', row: 6, col: 6},
+            {num: 75, symbol: 'Re', name: 'Rhenium', mass: '186.2', type: 'transition-metal', row: 6, col: 7},
+            {num: 76, symbol: 'Os', name: 'Osmium', mass: '190.2', type: 'transition-metal', row: 6, col: 8},
+            {num: 77, symbol: 'Ir', name: 'Iridium', mass: '192.2', type: 'transition-metal', row: 6, col: 9},
+            {num: 78, symbol: 'Pt', name: 'Platinum', mass: '195.1', type: 'transition-metal', row: 6, col: 10},
+            {num: 79, symbol: 'Au', name: 'Gold', mass: '197.0', type: 'transition-metal', row: 6, col: 11},
+            {num: 80, symbol: 'Hg', name: 'Mercury', mass: '200.6', type: 'transition-metal', row: 6, col: 12},
+            {num: 81, symbol: 'Tl', name: 'Thallium', mass: '204.4', type: 'post-transition', row: 6, col: 13},
+            {num: 82, symbol: 'Pb', name: 'Lead', mass: '207.2', type: 'post-transition', row: 6, col: 14},
+            {num: 83, symbol: 'Bi', name: 'Bismuth', mass: '209.0', type: 'post-transition', row: 6, col: 15},
+            {num: 84, symbol: 'Po', name: 'Polonium', mass: '209', type: 'metalloid', row: 6, col: 16},
+            {num: 85, symbol: 'At', name: 'Astatine', mass: '210', type: 'halogen', row: 6, col: 17},
+            {num: 86, symbol: 'Rn', name: 'Radon', mass: '222', type: 'noble-gas', row: 6, col: 18},
+            {num: 87, symbol: 'Fr', name: 'Francium', mass: '223', type: 'alkali-metal', row: 7, col: 1},
+            {num: 88, symbol: 'Ra', name: 'Radium', mass: '226', type: 'alkaline-earth', row: 7, col: 2},
+            {num: 89, symbol: 'Ac', name: 'Actinium', mass: '227', type: 'actinide', row: 7, col: 3},
+            {num: 104, symbol: 'Rf', name: 'Rutherfordium', mass: '267', type: 'transition-metal', row: 7, col: 4},
+            {num: 105, symbol: 'Db', name: 'Dubnium', mass: '268', type: 'transition-metal', row: 7, col: 5},
+            {num: 106, symbol: 'Sg', name: 'Seaborgium', mass: '269', type: 'transition-metal', row: 7, col: 6},
+            {num: 107, symbol: 'Bh', name: 'Bohrium', mass: '270', type: 'transition-metal', row: 7, col: 7},
+            {num: 108, symbol: 'Hs', name: 'Hassium', mass: '277', type: 'transition-metal', row: 7, col: 8},
+            {num: 109, symbol: 'Mt', name: 'Meitnerium', mass: '278', type: 'transition-metal', row: 7, col: 9},
+            {num: 110, symbol: 'Ds', name: 'Darmstadtium', mass: '281', type: 'transition-metal', row: 7, col: 10},
+            {num: 111, symbol: 'Rg', name: 'Roentgenium', mass: '282', type: 'transition-metal', row: 7, col: 11},
+            {num: 112, symbol: 'Cn', name: 'Copernicium', mass: '285', type: 'transition-metal', row: 7, col: 12},
+            {num: 113, symbol: 'Nh', name: 'Nihonium', mass: '286', type: 'post-transition', row: 7, col: 13},
+            {num: 114, symbol: 'Fl', name: 'Flerovium', mass: '289', type: 'post-transition', row: 7, col: 14},
+            {num: 115, symbol: 'Mc', name: 'Moscovium', mass: '290', type: 'post-transition', row: 7, col: 15},
+            {num: 116, symbol: 'Lv', name: 'Livermorium', mass: '293', type: 'post-transition', row: 7, col: 16},
+            {num: 117, symbol: 'Ts', name: 'Tennessine', mass: '294', type: 'halogen', row: 7, col: 17},
+            {num: 118, symbol: 'Og', name: 'Oganesson', mass: '294', type: 'noble-gas', row: 7, col: 18},
+            // Lanthanides
+            {num: 58, symbol: 'Ce', name: 'Cerium', mass: '140.1', type: 'lanthanide', row: 9, col: 4},
+            {num: 59, symbol: 'Pr', name: 'Praseodymium', mass: '140.9', type: 'lanthanide', row: 9, col: 5},
+            {num: 60, symbol: 'Nd', name: 'Neodymium', mass: '144.2', type: 'lanthanide', row: 9, col: 6},
+            {num: 61, symbol: 'Pm', name: 'Promethium', mass: '145', type: 'lanthanide', row: 9, col: 7},
+            {num: 62, symbol: 'Sm', name: 'Samarium', mass: '150.4', type: 'lanthanide', row: 9, col: 8},
+            {num: 63, symbol: 'Eu', name: 'Europium', mass: '152.0', type: 'lanthanide', row: 9, col: 9},
+            {num: 64, symbol: 'Gd', name: 'Gadolinium', mass: '157.3', type: 'lanthanide', row: 9, col: 10},
+            {num: 65, symbol: 'Tb', name: 'Terbium', mass: '158.9', type: 'lanthanide', row: 9, col: 11},
+            {num: 66, symbol: 'Dy', name: 'Dysprosium', mass: '162.5', type: 'lanthanide', row: 9, col: 12},
+            {num: 67, symbol: 'Ho', name: 'Holmium', mass: '164.9', type: 'lanthanide', row: 9, col: 13},
+            {num: 68, symbol: 'Er', name: 'Erbium', mass: '167.3', type: 'lanthanide', row: 9, col: 14},
+            {num: 69, symbol: 'Tm', name: 'Thulium', mass: '168.9', type: 'lanthanide', row: 9, col: 15},
+            {num: 70, symbol: 'Yb', name: 'Ytterbium', mass: '173.1', type: 'lanthanide', row: 9, col: 16},
+            {num: 71, symbol: 'Lu', name: 'Lutetium', mass: '175.0', type: 'lanthanide', row: 9, col: 17},
+            // Actinides
+            {num: 90, symbol: 'Th', name: 'Thorium', mass: '232.0', type: 'actinide', row: 10, col: 4},
+            {num: 91, symbol: 'Pa', name: 'Protactinium', mass: '231.0', type: 'actinide', row: 10, col: 5},
+            {num: 92, symbol: 'U', name: 'Uranium', mass: '238.0', type: 'actinide', row: 10, col: 6},
+            {num: 93, symbol: 'Np', name: 'Neptunium', mass: '237', type: 'actinide', row: 10, col: 7},
+            {num: 94, symbol: 'Pu', name: 'Plutonium', mass: '244', type: 'actinide', row: 10, col: 8},
+            {num: 95, symbol: 'Am', name: 'Americium', mass: '243', type: 'actinide', row: 10, col: 9},
+            {num: 96, symbol: 'Cm', name: 'Curium', mass: '247', type: 'actinide', row: 10, col: 10},
+            {num: 97, symbol: 'Bk', name: 'Berkelium', mass: '247', type: 'actinide', row: 10, col: 11},
+            {num: 98, symbol: 'Cf', name: 'Californium', mass: '251', type: 'actinide', row: 10, col: 12},
+            {num: 99, symbol: 'Es', name: 'Einsteinium', mass: '252', type: 'actinide', row: 10, col: 13},
+            {num: 100, symbol: 'Fm', name: 'Fermium', mass: '257', type: 'actinide', row: 10, col: 14},
+            {num: 101, symbol: 'Md', name: 'Mendelevium', mass: '258', type: 'actinide', row: 10, col: 15},
+            {num: 102, symbol: 'No', name: 'Nobelium', mass: '259', type: 'actinide', row: 10, col: 16},
+            {num: 103, symbol: 'Lr', name: 'Lawrencium', mass: '266', type: 'actinide', row: 10, col: 17}
+        ];
 
-        const expressionDisplay = document.getElementById('expression');
-        const resultDisplay = document.getElementById('result');
+        const seriesInfo = {
+            alkali: {
+                title: 'Alkali Metals (Group 1)',
+                description: 'Highly reactive metals with one valence electron. They readily form +1 cations and react vigorously with water.',
+                examples: [
+                    'Li (Lithium) - Lightest metal, used in batteries',
+                    'Na (Sodium) - Essential for nerve function, common salt',
+                    'K (Potassium) - Important nutrient, used in fertilizers',
+                    'Rb (Rubidium) - Used in atomic clocks and research',
+                    'Cs (Cesium) - Extremely reactive, used in atomic clocks',
+                    'Fr (Francium) - Highly radioactive, very rare'
+                ]
+            },
+            alkaline: {
+                title: 'Alkaline Earth Metals (Group 2)',
+                description: 'Reactive metals with two valence electrons. Form +2 cations and are less reactive than alkali metals.',
+                examples: [
+                    'Be (Beryllium) - Lightweight, used in aerospace',
+                    'Mg (Magnesium) - Essential for chlorophyll, lightweight alloys',
+                    'Ca (Calcium) - Bone structure, cement production',
+                    'Sr (Strontium) - Used in fireworks (red color)',
+                    'Ba (Barium) - Medical imaging, fireworks',
+                    'Ra (Radium) - Radioactive, historical medical use'
+                ]
+            },
+            halogens: {
+                title: 'Halogens (Group 17)',
+                description: 'Highly reactive nonmetals with seven valence electrons. Form -1 anions and are strong oxidizing agents.',
+                examples: [
+                    'F (Fluorine) - Most reactive element, dental health',
+                    'Cl (Chlorine) - Water disinfection, PVC production',
+                    'Br (Bromine) - Only liquid nonmetal at room temperature',
+                    'I (Iodine) - Essential for thyroid function',
+                    'At (Astatine) - Rare, radioactive halogen',
+                    'Ts (Tennessine) - Synthetic superheavy element'
+                ]
+            },
+            noble: {
+                title: 'Noble Gases (Group 18)',
+                description: 'Inert gases with complete valence shells. Very unreactive due to stable electron configuration.',
+                examples: [
+                    'He (Helium) - Lightest noble gas, party balloons',
+                    'Ne (Neon) - Bright signs, lighting',
+                    'Ar (Argon) - Inert atmosphere for welding',
+                    'Kr (Krypton) - High-performance lighting',
+                    'Xe (Xenon) - Medical imaging, ion propulsion',
+                    'Rn (Radon) - Radioactive, health hazard in basements',
+                    'Og (Oganesson) - Synthetic superheavy noble gas'
+                ]
+            },
+            transition: {
+                title: 'Transition Metals (Groups 3-12)',
+                description: 'Metals with partially filled d orbitals. Form colored compounds and multiple oxidation states.',
+                examples: [
+                    'Fe (Iron) - Most common metal, steel production',
+                    'Cu (Copper) - Electrical wiring, plumbing',
+                    'Au (Gold) - Precious metal, jewelry, electronics',
+                    'Ag (Silver) - Jewelry, photography, antimicrobial',
+                    'Pt (Platinum) - Catalytic converters, jewelry',
+                    'Ti (Titanium) - Strong, lightweight, biocompatible'
+                ]
+            },
+            lanthanides: {
+                title: 'Lanthanides (Rare Earth Elements)',
+                description: 'Elements with 4f orbitals being filled. Similar chemical properties, used in high-tech applications.',
+                examples: [
+                    'La (Lanthanum) - Camera lenses, batteries',
+                    'Ce (Cerium) - Self-cleaning ovens, catalysts',
+                    'Nd (Neodymium) - Powerful magnets, lasers',
+                    'Eu (Europium) - Red phosphors in TV screens',
+                    'Gd (Gadolinium) - MRI contrast agents',
+                    'Lu (Lutetium) - PET scan detectors'
+                ]
+            },
+            actinides: {
+                title: 'Actinides (Radioactive Series)',
+                description: 'Radioactive elements with 5f orbitals being filled. Most are synthetic and unstable.',
+                examples: [
+                    'Ac (Actinium) - Radioactive source',
+                    'Th (Thorium) - Potential nuclear fuel',
+                    'U (Uranium) - Nuclear fuel, weapons',
+                    'Pu (Plutonium) - Nuclear reactors, weapons',
+                    'Am (Americium) - Smoke detectors',
+                    'Cm (Curium) - Power source for space missions'
+                ]
+            }
+        };
 
-        function updateDisplay() {
-            expressionDisplay.textContent = currentExpression;
-            resultDisplay.textContent = displayValue;
+        function createPeriodicTable() {
+            const table = document.getElementById('periodicTable');
+            const maxRow = 10;
+            const maxCol = 18;
+
+            for (let row = 1; row <= maxRow; row++) {
+                for (let col = 1; col <= maxCol; col++) {
+                    const element = elements.find(e => e.row === row && e.col === col);
+                    
+                    if (element) {
+                        const div = document.createElement('div');
+                        div.className = `element ${element.type}`;
+                        div.dataset.type = element.type;
+                        div.dataset.num = element.num;
+                        div.innerHTML = `
+                            <div class="atomic-number">${element.num}</div>
+                            <div class="symbol">${element.symbol}</div>
+                            <div class="name">${element.name}</div>
+                            <div class="mass">${element.mass}</div>
+                        `;
+                        div.addEventListener('click', () => showElementInfo(element));
+                        table.appendChild(div);
+                    } else if (row <= 7) {
+                        const empty = document.createElement('div');
+                        empty.className = 'element empty';
+                        table.appendChild(empty);
+                    } else {
+                        const empty = document.createElement('div');
+                        empty.className = 'element empty';
+                        table.appendChild(empty);
+                    }
+                }
+            }
         }
 
-        function appendNumber(num) {
-            if (displayValue === '0' && num !== '.') {
-                displayValue = num;
-            } else if (displayValue === '0' && num === '.') {
-                displayValue = '0.';
-            } else {
-                // Prevent multiple decimals
-                if (num === '.' && displayValue.includes('.')) {
-                    return;
-                }
-                displayValue += num;
-            }
-            
-            if (currentExpression && isOperator(currentExpression[currentExpression.length - 1])) {
-                currentExpression += num;
-            } else if (!currentExpression) {
-                currentExpression = num;
-            } else {
-                currentExpression += num;
-            }
-            
-            updateDisplay();
+        function showElementInfo(element) {
+            const panel = document.getElementById('infoPanel');
+            panel.innerHTML = `
+                <div class="info-title">${element.name} (${element.symbol})</div>
+                <div class="info-content">
+                    <strong>Atomic Number:</strong> ${element.num}<br>
+                    <strong>Atomic Mass:</strong> ${element.mass}<br>
+                    <strong>Category:</strong> ${element.type.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                </div>
+            `;
         }
 
-        function appendOperator(op) {
-            if (!currentExpression) {
-                if (lastResult !== null) {
-                    currentExpression = lastResult + op;
-                    displayValue = lastResult.toString();
-                }
-                updateDisplay();
+        function highlightSeries(seriesType) {
+            const allElements = document.querySelectorAll('.element:not(.empty)');
+            allElements.forEach(el => el.classList.remove('highlighted'));
+
+            if (seriesType === 'reset') {
+                updateInfoPanel('Select a homologous series to explore', 
+                    'Click on any of the buttons above to highlight elements in the same homologous series.');
                 return;
             }
 
-            const lastChar = currentExpression[currentExpression.length - 1];
-            
-            // Replace operator if last character is an operator
-            if (isOperator(lastChar)) {
-                currentExpression = currentExpression.slice(0, -1) + op;
-            } else {
-                currentExpression += op;
+            let typeToHighlight;
+            switch(seriesType) {
+                case 'alkali': typeToHighlight = 'alkali-metal'; break;
+                case 'alkaline': typeToHighlight = 'alkaline-earth'; break;
+                case 'halogens': typeToHighlight = 'halogen'; break;
+                case 'noble': typeToHighlight = 'noble-gas'; break;
+                case 'transition': typeToHighlight = 'transition-metal'; break;
+                case 'lanthanides': typeToHighlight = 'lanthanide'; break;
+                case 'actinides': typeToHighlight = 'actinide'; break;
             }
-            
-            displayValue = '0';
-            updateDisplay();
-        }
 
-        function isOperator(char) {
-            return ['+', '-', '*', '/', '%'].includes(char);
-        }
-
-        function calculate() {
-            if (!currentExpression) return;
-
-            try {
-                resultDisplay.classList.add('calculating');
-                
-                // Replace display operators with actual operators
-                let expression = currentExpression
-                    .replace(/×/g, '*')
-                    .replace(/÷/g, '/')
-                    .replace(/−/g, '-');
-                
-                // Evaluate the expression
-                let result = eval(expression);
-                
-                // Handle division by zero and invalid results
-                if (!isFinite(result)) {
-                    displayValue = 'Error';
-                    currentExpression = '';
-                    lastResult = null;
-                } else {
-                    // Round to avoid floating point errors
-                    result = Math.round(result * 100000000) / 100000000;
-                    displayValue = result.toString();
-                    lastResult = result;
-                    currentExpression = '';
+            allElements.forEach(el => {
+                if (el.dataset.type === typeToHighlight) {
+                    el.classList.add('highlighted');
                 }
-                
-                setTimeout(() => {
-                    resultDisplay.classList.remove('calculating');
-                }, 300);
-                
-            } catch (error) {
-                displayValue = 'Error';
-                currentExpression = '';
-                lastResult = null;
+            });
+
+            const info = seriesInfo[seriesType];
+            updateInfoPanel(info.title, info.description, info.examples);
+        }
+
+        function updateInfoPanel(title, description, examples = null) {
+            const panel = document.getElementById('infoPanel');
+            let html = `
+                <div class="info-title">${title}</div>
+                <div class="info-content">${description}</div>
+            `;
+            
+            if (examples) {
+                html += `
+                    <div class="series-examples">
+                        <h3>Examples & Applications</h3>
+                        <ul>
+                            ${examples.map(ex => `<li>${ex}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
             }
             
-            updateDisplay();
+            panel.innerHTML = html;
         }
 
-        function clearAll() {
-            currentExpression = '';
-            displayValue = '0';
-            lastResult = null;
-            updateDisplay();
-        }
-
-        function deleteLast() {
-            if (currentExpression) {
-                currentExpression = currentExpression.slice(0, -1);
-                
-                // Update display value based on remaining expression
-                if (currentExpression) {
-                    const parts = currentExpression.split(/[\+\-\*\/\%]/);
-                    const lastPart = parts[parts.length - 1];
-                    displayValue = lastPart || '0';
-                } else {
-                    displayValue = '0';
-                }
-                
-                updateDisplay();
-            }
-        }
-
-        // Keyboard support
-        document.addEventListener('keydown', (e) => {
-            if (e.key >= '0' && e.key <= '9') {
-                appendNumber(e.key);
-            } else if (e.key === '.') {
-                appendNumber('.');
-            } else if (e.key === '+') {
-                appendOperator('+');
-            } else if (e.key === '-') {
-                appendOperator('-');
-            } else if (e.key === '*') {
-                appendOperator('*');
-            } else if (e.key === '/') {
-                e.preventDefault();
-                appendOperator('/');
-            } else if (e.key === '%') {
-                appendOperator('%');
-            } else if (e.key === 'Enter' || e.key === '=') {
-                e.preventDefault();
-                calculate();
-            } else if (e.key === 'Escape') {
-                clearAll();
-            } else if (e.key === 'Backspace') {
-                e.preventDefault();
-                deleteLast();
-            }
+        document.querySelectorAll('.series-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.series-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                highlightSeries(this.dataset.series);
+            });
         });
 
-        // Initialize display
-        updateDisplay();
+        createPeriodicTable();
     </script>
 </body>
 </html>
